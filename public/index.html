@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #messages {
+            border: 1px solid #ddd;
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+        #messageInput {
+            width: 80%;
+            padding: 8px;
+        }
+        #sendButton {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Client</h1>
+    <div id="messages">Messages will appear here...</div>
+    <input type="text" id="messageInput" placeholder="Type a message">
+    <button id="sendButton">Send</button>
+
+    <script>
+        // Connect to the WebSocket server
+        const ws = new WebSocket('ws://localhost:8080/ws');
+
+        const messagesDiv = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+
+        let username = null;
+
+        // Function to prompt for username
+        function requestUsername() {
+            username = prompt('Please enter your username:');
+            if (!username) {
+                alert('Username is required to send messages.');
+            }
+        }
+
+        // Display messages from the server
+        ws.onmessage = (event) => {
+            const message = document.createElement('div');
+            message.textContent = `${event.data}`;
+            messagesDiv.appendChild(message);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll to the bottom
+        };
+
+        // Log connection open
+        ws.onopen = () => {
+            const message = document.createElement('div');
+            message.textContent = 'Connected to WebSocket server';
+            messagesDiv.appendChild(message);
+        };
+
+        // Log errors
+        ws.onerror = (error) => {
+            const message = document.createElement('div');
+            message.textContent = `Error: ${error.message}`;
+            messagesDiv.appendChild(message);
+        };
+
+        // Log connection close
+        ws.onclose = () => {
+            const message = document.createElement('div');
+            message.textContent = 'Disconnected from WebSocket server';
+            messagesDiv.appendChild(message);
+        };
+
+        // Send messages to the server
+        sendButton.addEventListener('click', () => {
+            if (!username) {
+                requestUsername();
+                if (!username) return; // Stop if no username is provided
+            }
+
+            const message = messageInput.value;
+            if (message) {
+                ws.send(`${username}: ${message}`);
+                const messageDiv = document.createElement('div');
+                messageDiv.textContent = `${username}(You): ${message}`;
+                messagesDiv.appendChild(messageDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                messageInput.value = ''; // Clear the input field
+            }
+        });
+    </script>
+</body>
+</html>
