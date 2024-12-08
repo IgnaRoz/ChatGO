@@ -10,7 +10,7 @@ El servidor de chat está construido utilizando el paquete `net/http` de Go y la
 
 - Conexión de múltiples usuarios a través de WebSockets.
 - Envío y recepción de mensajes en tiempo real.
-- Gestión de usuarios y mensajes en un grupo de chat.
+- Gestión de usuarios y mensajes en un grupo de chat.(En proceso)
 
 ## Uso
 
